@@ -1,0 +1,141 @@
+﻿  boundingBox.cpp
+  bvh.cpp
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\boundingBox.cpp(85,10): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\boundingBox.cpp(95,10): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\boundingBox.cpp(105,10): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\boundingBox.cpp(121,10): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\maths.h(69,8): warning C4244: 'return': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'bvh.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(42,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'bvh.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(41,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'bvh.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(40,28): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'bvh.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\bvh.cpp(25,47): warning C4267: 'return': conversão de 'size_t' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\bvh.cpp(45,35): warning C4267: 'argumento': conversão de 'size_t' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\bvh.cpp(60,10): warning C4101: 'tmp': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\bvh.cpp(72,10): warning C4101: 'tmp': variável local não referenciada
+  grid.cpp
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\maths.h(69,8): warning C4244: 'return': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'grid.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(42,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'grid.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(41,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'grid.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(40,28): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'grid.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(9,21): warning C4267: 'return': conversão de 'size_t' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(63,18): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(64,18): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(65,18): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(80,13): warning C4244: 'inicializando': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(81,13): warning C4244: 'inicializando': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(82,13): warning C4244: 'inicializando': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(83,13): warning C4244: 'inicializando': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(84,13): warning C4244: 'inicializando': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(85,13): warning C4244: 'inicializando': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(32,6): warning C4101: 'xmin': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(33,12): warning C4101: 'ymax': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(34,12): warning C4101: 'zmax': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(35,6): warning C4101: 'index': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(33,6): warning C4101: 'ymin': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(32,12): warning C4101: 'xmax': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(34,6): warning C4101: 'zmin': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(124,10): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(134,10): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(144,10): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(177,13): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(178,13): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(179,13): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(183,13): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(184,13): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\grid.cpp(185,13): warning C4244: '=': conversão de 'double' para 'int', possível perda de dados
+  main.cpp
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\maths.h(69,8): warning C4244: 'return': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'main.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(42,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'main.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(41,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'main.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(40,28): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'main.cpp')
+  
+  scene.cpp
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\maths.h(69,8): warning C4244: 'return': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'scene.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(42,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'scene.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(41,14): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'scene.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\color.h(40,28): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'scene.cpp')
+  
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(143,21): warning C4267: 'return': conversão de 'size_t' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(163,20): warning C4267: 'return': conversão de 'size_t' para 'int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(291,23): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(292,23): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(231,8): warning C4101: 't_intersec': variável local não referenciada
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(357,56): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(357,53): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(357,46): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(357,42): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(357,34): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(411,23): warning C4018: '<': incompatibilidade de signed/unsigned
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(415,23): warning C4018: '<': incompatibilidade de signed/unsigned
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(488,56): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(529,40): warning C4244: 'argumento': conversão de 'time_t' para 'const int', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(533,38): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(539,50): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(539,40): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(539,30): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(539,112): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(558,59): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(558,52): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(558,29): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(560,30): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(562,77): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(562,62): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(562,47): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(563,34): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(568,116): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(568,95): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(568,74): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(569,34): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(574,79): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(575,34): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(584,75): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(589,42): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(589,37): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(589,32): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(589,75): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(589,48): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(594,42): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(594,37): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(594,32): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(594,64): warning C4305: 'argumento': truncamento de 'double' para 'float'
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\scene.cpp(594,59): warning C4305: 'argumento': truncamento de 'double' para 'float'
+  vector.cpp
+C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\vector.cpp(64,15): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+  Gerando Código...
+  Template.vcxproj -> C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\x64\Debug\Template.exe
+  C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\Dependencies\lib\x64\DevIL.dll
+  C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\Dependencies\lib\x64\freeglut.dll
+  C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\Dependencies\lib\x64\glew32.dll
+  C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\Dependencies\lib\x64\ILU.dll
+  C:\Users\José Cardoso\Desktop\Cadeiras\4º Ano - 2º Semestre\P3D\Labs\EX1\Template\Dependencies\lib\x64\ILUT.dll
+  5 File(s) copied
