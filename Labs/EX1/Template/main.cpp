@@ -464,7 +464,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 
 	for (int i = 0; i < scene->getNumObjects(); i++) {
 		Object* curObject = scene->getObject(i);
-		if (curObject->intercepts(ray, t)) {
+		if (curObject->intercepts(ray, t) && (t < min_t)) {
 			min_obj = curObject;
 			min_t = t;
 		}
@@ -489,7 +489,7 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		Vector L = (curLight->position - intercept).normalize();
 		Ray feeler = Ray(intercept, L);
 		bool inShadow = false;
-		for (int j = 0; j < scene->getNumObjects(); i++) {
+		for (int j = 0; j < scene->getNumObjects(); j++) {
 			obj = scene->getObject(j);
 			if (obj->intercepts(feeler, t)) {
 				inShadow = true;
@@ -503,47 +503,49 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		}
 	}
 	color += diffuse * mat->GetDiffuse() + specular * mat->GetSpecular();
+	//cout << diffuse.r() << " " << diffuse.g() << " " << diffuse.b() << " spec: " << specular.r() << " " << specular.g() << " " << specular.b() << "\n";
+	//cout << color.r() << " " << color.g() << " " << color.b() << "\n";
 
 	if (depth >= MAX_DEPTH) return color;
 
-	// Reflection
-	Color reflection = Color();
-	if (mat->GetReflection() > 0) {
-		Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
-		Ray reflectionRay = Ray(intercept, rayDirection);
-		reflection = rayTracing(reflectionRay, depth + 1, ior_1);
-	}
+	//// Reflection
+	//Color reflection = Color();
+	//if (mat->GetReflection() > 0) {
+	//	Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
+	//	Ray reflectionRay = Ray(intercept, rayDirection);
+	//	reflection = rayTracing(reflectionRay, depth + 1, ior_1);
+	//}
 
-	// Refraction
-	float ratio = 0;
-	Vector view = ray.direction * -1;
-	Vector viewNormal = (normal * (view * normal));
-	Vector viewTangent = viewNormal - view;
-	Color refraction = Color();
-	if (mat->GetTransmittance() == 0)
-		ratio = mat->GetSpecular();
-	else {
-		float index = ior_1 / mat->GetRefrIndex();
-		float cosI = viewNormal.length();
-		float sinT = (index)*viewTangent.length();
-		float cosT;
-		float ins = 1 - pow(sinT, 2);
-		float reflectanceForS = 1;
-		float reflectanceForP = 1;
-		if (ins >= 0) {
-			cosT = sqrt(ins);
-			Vector refractionDirection = (viewTangent.normalize() * sinT + normal * (-cosT)).normalize();
-			Vector refractionInterception = beforeOffset + refractionDirection * 0.0001;
-			Ray refractedRay = Ray(refractionInterception, refractionDirection);
-			float matRefrIndex = mat->GetRefrIndex();
-			refraction = rayTracing(refractedRay, depth + 1, matRefrIndex);
-			reflectanceForS = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
-			reflectanceForP = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
-		}
-		ratio = 1 / 2 * (reflectanceForS + reflectanceForP);
-	}
+	//// Refraction
+	//float ratio = 0;
+	//Vector view = ray.direction * -1;
+	//Vector viewNormal = (normal * (view * normal));
+	//Vector viewTangent = viewNormal - view;
+	//Color refraction = Color();
+	//if (mat->GetTransmittance() == 0)
+	//	ratio = mat->GetSpecular();
+	//else {
+	//	float index = ior_1 / mat->GetRefrIndex();
+	//	float cosI = viewNormal.length();
+	//	float sinT = (index)*viewTangent.length();
+	//	float cosT;
+	//	float ins = 1 - pow(sinT, 2);
+	//	float reflectanceForS = 1;
+	//	float reflectanceForP = 1;
+	//	if (ins >= 0) {
+	//		cosT = sqrt(ins);
+	//		Vector refractionDirection = (viewTangent.normalize() * sinT + normal * (-cosT)).normalize();
+	//		Vector refractionInterception = beforeOffset + refractionDirection * 0.0001;
+	//		Ray refractedRay = Ray(refractionInterception, refractionDirection);
+	//		float matRefrIndex = mat->GetRefrIndex();
+	//		refraction = rayTracing(refractedRay, depth + 1, matRefrIndex);
+	//		reflectanceForS = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
+	//		reflectanceForP = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
+	//	}
+	//	ratio = 1 / 2 * (reflectanceForS + reflectanceForP);
+	//}
 
-	color += reflection * ratio + refraction * (1 - ratio);
+	//color += reflection * ratio + refraction * (1 - ratio);
 	return color;
 }
 

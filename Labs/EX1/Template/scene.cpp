@@ -53,7 +53,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
    float l;
 
    //Calculate the normal plane: counter-clockwise vectorial product.
-   PN = Vector(0, 0, 0);		
+   PN = (P2 - P1) % (P0 - P1);
 
    if ((l=PN.length()) == 0.0)
    {
@@ -63,7 +63,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
    {
      PN.normalize();
 	 //Calculate D
-     D  = 0.0f;
+     D = 0.0f;
    }
 }
 
@@ -73,8 +73,20 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 
 bool Plane::intercepts( Ray& r, float& t )
 {
-	//PUT HERE YOUR CODE
-   return (false);
+	float numer = (r.origin) * PN;
+	float divid = PN * r.direction;
+
+	if (fabs(divid) < 0.0001) {
+		return false;
+	}
+
+	t = -(numer / divid);
+
+	if (t <= 0) {
+		return false;
+	}
+
+	return (true);
 }
 
 Vector Plane::getNormal(Vector point) 
@@ -85,8 +97,36 @@ Vector Plane::getNormal(Vector point)
 
 bool Sphere::intercepts(Ray& r, float& t )
 {
-	//PUT HERE YOUR CODE
-  return (false);
+	Vector Rd = r.direction;
+
+	Vector co = (center - r.origin);
+
+	float doc2 = (co.x * co.x) + (co.y * co.y) + (co.z * co.z);
+
+	float b = co * Rd;
+
+	float c = doc2 - radius * radius;
+
+	if (c > 0) {
+		if (b < 0) {
+			return false;
+		}
+	}
+
+	float discriminant = (b * b - c);
+
+	if (discriminant < 0) {
+		return false;
+	}
+
+	if (c > 0) {
+		t = b - sqrt(discriminant);
+	}
+	else {
+		t = b + sqrt(discriminant);
+	}
+
+	return (true);
 }
 
 
