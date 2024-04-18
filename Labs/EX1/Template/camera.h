@@ -73,16 +73,16 @@ public:
 	Ray PrimaryRay(const Vector& pixel_sample) //  Rays cast from the Eye to a pixel sample which is in Viewport coordinates
 	{
 		Vector ray_dir;
+		Vector p;
 
-		Vector ps;
-		ps.x = w * (pixel_sample.x / res_x - 0.5f);
-		ps.y = h * (pixel_sample.y / res_y - 0.5f);
-		ps.z = -plane_dist; //df
+		p.x = w * (pixel_sample.x / res_x - 0.5f);
+		p.y = h * (pixel_sample.y / res_y - 0.5f);
+		p.z = -plane_dist; //df
 
-		//calculate ray direction
-		Vector vX = u * ps.x;
-		Vector vY = v * ps.y;
-		Vector vZ = n * ps.z;
+		//calculate direction
+		Vector vX = u * p.x;
+		Vector vY = v * p.y;
+		Vector vZ = n * p.z;
 
 		ray_dir = (vX + vY + vZ).normalize();
 
