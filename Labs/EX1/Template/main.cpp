@@ -25,7 +25,7 @@
 #include "macros.h"
 
 //Enable OpenGL drawing.  
-bool drawModeEnabled = true;
+bool drawModeEnabled = false;
 
 bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
@@ -455,10 +455,97 @@ void setupGLUT(int argc, char* argv[])
 
 Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
 {
-	//INSERT HERE YOUR CODE
-	return Color(0.0f, 0.0f, 0.0f);
-}
+	Vector hit_p;
+	Object* obj = NULL;
+	Object* min_obj = NULL;
 
+	float min_t = FLT_MAX;
+	float t = FLT_MAX;
+
+	for (int i = 0; i < scene->getNumObjects(); i++) {
+		Object* curObject = scene->getObject(i);
+		if (curObject->intercepts(ray, t)) {
+			min_obj = curObject;
+			min_t = t;
+		}
+	}
+
+	if (min_obj == NULL) {
+		if (scene->GetSkyBoxFlg()) return scene->GetSkyboxColor(ray);
+		else return scene->GetBackgroundColor();
+	}
+
+	Material* mat = min_obj->GetMaterial();
+	Color color = Color();
+	Color diffuse = Color();
+	Color specular = Color();
+
+	Vector beforeOffset = ray.origin + ray.direction * min_t;
+	Vector intercept = beforeOffset + min_obj->getNormal(beforeOffset) * 0.0001;
+	Vector normal = min_obj->getNormal(intercept);
+
+	for (int i = 0; i < scene->getNumLights(); i++) {
+		Light* curLight = scene->getLight(i);
+		Vector L = (curLight->position - intercept).normalize();
+		Ray feeler = Ray(intercept, L);
+		bool inShadow = false;
+		for (int j = 0; j < scene->getNumObjects(); i++) {
+			obj = scene->getObject(j);
+			if (obj->intercepts(feeler, t)) {
+				inShadow = true;
+				break;
+			}
+		}
+		Vector temp = ((L + (ray.direction * -1)) / 2).normalize();
+		if (!inShadow) {
+			diffuse += (curLight->color * mat->GetDiffColor()) * (max(0, normal * L));
+			specular += (curLight->color * mat->GetSpecColor()) * pow(max(0, temp * normal), mat->GetShine());
+		}
+	}
+	color += diffuse * mat->GetDiffuse() + specular * mat->GetSpecular();
+
+	if (depth >= MAX_DEPTH) return color;
+
+	// Reflection
+	Color reflection = Color();
+	if (mat->GetReflection() > 0) {
+		Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
+		Ray reflectionRay = Ray(intercept, rayDirection);
+		reflection = rayTracing(reflectionRay, depth + 1, ior_1);
+	}
+
+	// Refraction
+	float ratio = 0;
+	Vector view = ray.direction * -1;
+	Vector viewNormal = (normal * (view * normal));
+	Vector viewTangent = viewNormal - view;
+	Color refraction = Color();
+	if (mat->GetTransmittance() == 0)
+		ratio = mat->GetSpecular();
+	else {
+		float index = ior_1 / mat->GetRefrIndex();
+		float cosI = viewNormal.length();
+		float sinT = (index)*viewTangent.length();
+		float cosT;
+		float ins = 1 - pow(sinT, 2);
+		float reflectanceForS = 1;
+		float reflectanceForP = 1;
+		if (ins >= 0) {
+			cosT = sqrt(ins);
+			Vector refractionDirection = (viewTangent.normalize() * sinT + normal * (-cosT)).normalize();
+			Vector refractionInterception = beforeOffset + refractionDirection * 0.0001;
+			Ray refractedRay = Ray(refractionInterception, refractionDirection);
+			float matRefrIndex = mat->GetRefrIndex();
+			refraction = rayTracing(refractedRay, depth + 1, matRefrIndex);
+			reflectanceForS = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
+			reflectanceForP = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
+		}
+		ratio = 1 / 2 * (reflectanceForS + reflectanceForP);
+	}
+
+	color += reflection * ratio + refraction * (1 - ratio);
+	return color;
+}
 
 
 // Render function by primary ray casting from the eye towards the scene's objects
@@ -484,13 +571,9 @@ void renderScene()
 			pixel.x = x + 0.5f;
 			pixel.y = y + 0.5f;
 
-			/*YOUR 2 FUNTIONS:
 			Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
 
 			color = rayTracing(ray, 1, 1.0).clamp();
-			*/
-
-			color = scene->GetBackgroundColor(); //TO CHANGE - just for the template
 
 			img_Data[counter++] = u8fromfloat((float)color.r());
 			img_Data[counter++] = u8fromfloat((float)color.g());

@@ -12,7 +12,7 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	points[0] = P0; points[1] = P1; points[2] = P2;
 
 	/* Calculate the normal */
-	normal = Vector(0, 0, 0);
+	normal = (P1 - P0) % (P2 - P0);
 	normal.normalize();
 
 	//YOUR CODE to Calculate the Min and Max for bounding box
