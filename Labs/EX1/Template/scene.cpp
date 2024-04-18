@@ -63,7 +63,7 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
    {
      PN.normalize();
 	 //Calculate D
-     D = 0.0f;
+	 D = PN * P0 * -1;
    }
 }
 
@@ -73,6 +73,21 @@ Plane::Plane(Vector& P0, Vector& P1, Vector& P2)
 
 bool Plane::intercepts( Ray& r, float& t )
 {
+
+	//r.direction.normalize();
+
+	//float vd = PN * r.direction;
+
+	//if (vd == 0) {
+	//	return false;
+	//}
+
+	//float v0 = -(PN * r.origin + D);
+
+	//t = v0 / vd;
+
+	//return t >= 0;
+
 	float numer = (r.origin) * PN;
 	float divid = PN * r.direction;
 
@@ -80,7 +95,7 @@ bool Plane::intercepts( Ray& r, float& t )
 		return false;
 	}
 
-	t = -(numer / divid);
+	t = -((numer + D) / divid);
 
 	if (t <= 0) {
 		return false;
