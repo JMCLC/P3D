@@ -27,7 +27,7 @@
 //Enable OpenGL drawing.  
 bool drawModeEnabled = false;
 
-bool P3F_scene = true; //choose between P3F scene or a built-in random scene
+bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -503,49 +503,43 @@ Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medi
 		}
 	}
 	color += diffuse * mat->GetDiffuse() + specular * mat->GetSpecular();
-	//cout << diffuse.r() << " " << diffuse.g() << " " << diffuse.b() << " spec: " << specular.r() << " " << specular.g() << " " << specular.b() << "\n";
-	//cout << color.r() << " " << color.g() << " " << color.b() << "\n";
 
 	if (depth >= MAX_DEPTH) return color;
 
-	//// Reflection
-	//Color reflection = Color();
-	//if (mat->GetReflection() > 0) {
-	//	Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
-	//	Ray reflectionRay = Ray(intercept, rayDirection);
-	//	reflection = rayTracing(reflectionRay, depth + 1, ior_1);
-	//}
+	// Reflection
+	Color reflection = Color();
+	if (mat->GetReflection() > 0) {
+		Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
+		Ray reflectionRay = Ray(intercept, rayDirection);
+		reflection = rayTracing(reflectionRay, depth + 1, ior_1);
+	}
 
-	//// Refraction
-	//float ratio = 0;
-	//Vector view = ray.direction * -1;
-	//Vector viewNormal = (normal * (view * normal));
-	//Vector viewTangent = viewNormal - view;
-	//Color refraction = Color();
-	//if (mat->GetTransmittance() == 0)
-	//	ratio = mat->GetSpecular();
-	//else {
-	//	float index = ior_1 / mat->GetRefrIndex();
-	//	float cosI = viewNormal.length();
-	//	float sinT = (index)*viewTangent.length();
-	//	float cosT;
-	//	float ins = 1 - pow(sinT, 2);
-	//	float reflectanceForS = 1;
-	//	float reflectanceForP = 1;
-	//	if (ins >= 0) {
-	//		cosT = sqrt(ins);
-	//		Vector refractionDirection = (viewTangent.normalize() * sinT + normal * (-cosT)).normalize();
-	//		Vector refractionInterception = beforeOffset + refractionDirection * 0.0001;
-	//		Ray refractedRay = Ray(refractionInterception, refractionDirection);
-	//		float matRefrIndex = mat->GetRefrIndex();
-	//		refraction = rayTracing(refractedRay, depth + 1, matRefrIndex);
-	//		reflectanceForS = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
-	//		reflectanceForP = pow(fabs((ior_1 * cosI - matRefrIndex * cosT) / (ior_1 * cosI + matRefrIndex * cosT)), 2);
-	//	}
-	//	ratio = 1 / 2 * (reflectanceForS + reflectanceForP);
-	//}
+	// Refraction
+	float kr = 0;
+	Vector view = ray.direction * -1;
+	Vector viewNormal = (normal * (view * normal));
+	Vector viewTangent = viewNormal - view;
+	Color refraction = Color();
+	if (mat->GetTransmittance() == 0)
+		kr = mat->GetSpecular();
+	else {
+		float ni = ior_1;
+		float nt = mat->GetRefrIndex();
+		float r0 = pow( (ni - nt) / (ni + nt), 2);
+		float cos0i = viewNormal.length();
+		float sin0t = (ior_1 / nt) * viewTangent.length();
+		float cos0t = sqrt(1 - pow(sin0t, 2));
+		Vector refractionDirection = (viewTangent.normalize() * sin0t + normal * (-cos0t)).normalize();
+		Vector refractionInterception = beforeOffset + refractionDirection * 0.0001;
+		Ray refractedRay = Ray(refractionInterception, refractionDirection);
+		refraction = rayTracing(refractedRay, depth + 1, nt);
+		if (ni > nt)
+			kr = r0 + ((1 - r0) * pow(1 - cos0t, 5));
+		else
+			kr = r0 + ((1 - r0) * pow(1 - cos0i, 5));
+	}
 
-	//color += reflection * ratio + refraction * (1 - ratio);
+	color += reflection * kr + refraction * (1 - kr);
 	return color;
 }
 
