@@ -20,6 +20,9 @@ public:
 	Vector&	normalize();
 	Vector operator=(const Vector& v);
 	Vector operator+( const Vector& v );
+	Vector operator+(const float& v) {
+		return Vector(x + v, y + v, z + v);
+	}
 	Vector operator-( const Vector& v );
 	Vector operator*( float f );
 	float  operator*(const Vector& v);   //inner product

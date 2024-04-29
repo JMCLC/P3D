@@ -24,14 +24,18 @@
 #include "maths.h"
 #include "macros.h"
 
+#include <random>
+
 //Enable OpenGL drawing.  
 bool drawModeEnabled = false;
 
-bool P3F_scene = false; //choose between P3F scene or a built-in random scene
+bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
-bool antiAliasing = true;
-bool softShadows = true;
+bool antiAliasing = false;
+bool softShadows = false;
 bool depthOfField = false;
+bool fuzzyReflection = true;
+float roughnessParam = 0.3;
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -456,14 +460,11 @@ void setupGLUT(int argc, char* argv[])
 
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
-//Auxiliary function -> calculates adjusted intersection point
-Vector offsetIntersection(Vector inter, Vector normal) {
-	return  inter + normal * .0001;
-}
-
-float remap(float min1, float max1, float min2, float max2, float value) {
-
-	return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+Vector rand_in_unit_sphere(Vector p) {
+	random_device rd;
+	mt19937 gen(rd());
+	uniform_real_distribution<float> rand(-1.0, 1.0);
+	return Vector(p.x + rand(gen), p.y + rand(gen), p.z + rand(gen));
 }
 
 //Main ray tracing function (index of refraction of medium 1 where the ray is travelling)
@@ -534,7 +535,25 @@ Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool ins
 		if (mat->GetReflection() > 0) {
 			Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
 			Ray rRay = Ray(intercept, rayDirection);
-			rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);
+			if (fuzzyReflection){
+				Vector v = rand_in_unit_sphere(intercept + rayDirection);
+				printf("Vector v: %v", v);
+				Vector s = intercept + r + v * roughnessParam;
+				Vector direction = s - intercept = ((rayDirection + v) * roughnessParam).normalize();
+				Ray fuzzyRay = Ray(intercept, direction);
+				float v2 = ray.direction * normal;
+				bool test = v2 > 0;
+				printf("Fuzzy Calculation: %f", v);
+				if (test) {
+					printf("It is a fuzzy Reflection");
+					rColor = rayTracing(fuzzyRay, depth + 1, ior_1, i, j, inside);
+				} else {
+					rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);
+				}
+			}
+			else {
+				rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);
+			}
 		}
 
 		Color tColor = Color();
