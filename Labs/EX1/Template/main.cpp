@@ -1,4 +1,4 @@
- ///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 //
 // P3D Course
 // (c) 2021 by João Madeiras Pereira
@@ -29,6 +29,10 @@ bool drawModeEnabled = false;
 
 bool P3F_scene = false; //choose between P3F scene or a built-in random scene
 
+bool antiAliasing = true;
+bool softShadows = true;
+bool depthOfField = false;
+
 #define MAX_DEPTH 4  //number of bounces
 
 #define CAPTION "Whitted Ray-Tracer"
@@ -56,13 +60,13 @@ char s[32];
 
 
 // Points defined by 2 attributes: positions which are stored in vertices array and colors which are stored in colors array
-float *colors;
-float *vertices;
+float* colors;
+float* vertices;
 int size_vertices;
 int size_colors;
 
 //Array of Pixels to be stored in a file by using DevIL library
-uint8_t *img_Data;
+uint8_t* img_Data;
 
 GLfloat m[16];  //projection matrix initialized by ortho function
 
@@ -89,7 +93,7 @@ int WindowHandle = 0;
 bool isOpenGLError() {
 	bool isError = false;
 	GLenum errCode;
-	const GLubyte *errString;
+	const GLubyte* errString;
 	while ((errCode = glGetError()) != GL_NO_ERROR) {
 		isError = true;
 		errString = gluErrorString(errCode);
@@ -100,7 +104,7 @@ bool isOpenGLError() {
 
 void checkOpenGLError(std::string error)
 {
-	if(isOpenGLError()) {
+	if (isOpenGLError()) {
 		std::cerr << error << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -155,7 +159,7 @@ void createShaderProgram()
 
 	glBindAttribLocation(ProgramId, VERTEX_COORD_ATTRIB, "in_Position");
 	glBindAttribLocation(ProgramId, COLOR_ATTRIB, "in_Color");
-	
+
 	glLinkProgram(ProgramId);
 	UniformId = glGetUniformLocation(ProgramId, "Matrix");
 
@@ -189,17 +193,17 @@ void createBufferObjects()
 	glBufferData(GL_ARRAY_BUFFER, size_vertices, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glVertexAttribPointer(VERTEX_COORD_ATTRIB, 2, GL_FLOAT, 0, 0, 0);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, VboId[1]);
 	glBufferData(GL_ARRAY_BUFFER, size_colors, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(COLOR_ATTRIB);
 	glVertexAttribPointer(COLOR_ATTRIB, 3, GL_FLOAT, 0, 0, 0);
-	
-// unbind the VAO
+
+	// unbind the VAO
 	glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB); 
-//	glDisableVertexAttribArray(COLOR_ATTRIB);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB); 
+	//	glDisableVertexAttribArray(COLOR_ATTRIB);
 	checkOpenGLError("ERROR: Could not create VAOs and VBOs.");
 }
 
@@ -207,7 +211,7 @@ void destroyBufferObjects()
 {
 	glDisableVertexAttribArray(VERTEX_COORD_ATTRIB);
 	glDisableVertexAttribArray(COLOR_ATTRIB);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -230,7 +234,7 @@ void drawPoints()
 	glBufferSubData(GL_ARRAY_BUFFER, 0, size_colors, colors);
 
 	glUniformMatrix4fv(UniformId, 1, GL_FALSE, m);
-	glDrawArrays(GL_POINTS, 0, RES_X*RES_Y);
+	glDrawArrays(GL_POINTS, 0, RES_X * RES_Y);
 	glFinish();
 
 	glUseProgram(0);
@@ -240,7 +244,7 @@ void drawPoints()
 	checkOpenGLError("ERROR: Could not draw scene.");
 }
 
-ILuint saveImgFile(const char *filename) {
+ILuint saveImgFile(const char* filename) {
 	ILuint ImageId;
 
 	ilEnable(IL_FILE_OVERWRITE);
@@ -278,8 +282,8 @@ void cleanup()
 	destroyBufferObjects();
 }
 
-void ortho(float left, float right, float bottom, float top, 
-			float nearp, float farp)
+void ortho(float left, float right, float bottom, float top,
+	float nearp, float farp)
 {
 	m[0 * 4 + 0] = 2 / (right - left);
 	m[0 * 4 + 1] = 0.0;
@@ -301,7 +305,7 @@ void ortho(float left, float right, float bottom, float top,
 
 void reshape(int w, int h)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, w, h);
 	ortho(0, (float)RES_X, 0, (float)RES_Y, -1.0, 1.0);
 }
@@ -310,23 +314,23 @@ void processKeys(unsigned char key, int xx, int yy)
 {
 	switch (key) {
 
-		case 27:
-			glutLeaveMainLoop();
-			break;
+	case 27:
+		glutLeaveMainLoop();
+		break;
 
-		case 'r':
-			camX = Eye.x;
-			camY = Eye.y;
-			camZ = Eye.z;
-			r = Eye.length();
-			beta = asinf(camY / r) * 180.0f / 3.14f;
-			alpha = atanf(camX / camZ) * 180.0f / 3.14f;
-			break;
+	case 'r':
+		camX = Eye.x;
+		camY = Eye.y;
+		camZ = Eye.z;
+		r = Eye.length();
+		beta = asinf(camY / r) * 180.0f / 3.14f;
+		alpha = atanf(camX / camZ) * 180.0f / 3.14f;
+		break;
 
-		case 'c':
-			printf("Camera Spherical Coordinates (%f, %f, %f)\n", r, beta, alpha);
-			printf("Camera Cartesian Coordinates (%f, %f, %f)\n", camX, camY, camZ);
-			break;
+	case 'c':
+		printf("Camera Spherical Coordinates (%f, %f, %f)\n", r, beta, alpha);
+		printf("Camera Cartesian Coordinates (%f, %f, %f)\n", camX, camY, camZ);
+		break;
 	}
 }
 
@@ -417,34 +421,34 @@ void mouseWheel(int wheel, int direction, int x, int y) {
 
 void setupGLEW() {
 	glewExperimental = GL_TRUE;
-	GLenum result = glewInit() ; 
-	if (result != GLEW_OK) { 
+	GLenum result = glewInit();
+	if (result != GLEW_OK) {
 		std::cerr << "ERROR glewInit: " << glewGetString(result) << std::endl;
 		exit(EXIT_FAILURE);
-	} 
+	}
 	GLenum err_code = glGetError();
-	printf ("Vendor: %s\n", glGetString (GL_VENDOR));
-	printf ("Renderer: %s\n", glGetString (GL_RENDERER));
-	printf ("Version: %s\n", glGetString (GL_VERSION));
-	printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+	printf("Vendor: %s\n", glGetString(GL_VENDOR));
+	printf("Renderer: %s\n", glGetString(GL_RENDERER));
+	printf("Version: %s\n", glGetString(GL_VERSION));
+	printf("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
 
 void setupGLUT(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
-	
+
 	glutInitContextVersion(4, 3);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 
-	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-	
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
 	glutInitWindowPosition(100, 250);
 	glutInitWindowSize(RES_X, RES_Y);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glDisable(GL_DEPTH_TEST);
 	WindowHandle = glutCreateWindow(CAPTION);
-	if(WindowHandle < 1) {
+	if (WindowHandle < 1) {
 		std::cerr << "ERROR: Could not create a new rendering window." << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -452,97 +456,120 @@ void setupGLUT(int argc, char* argv[])
 
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
-
-Color rayTracing(Ray ray, int depth, float ior_1)  //index of refraction of medium 1 where the ray is travelling
-{
-	Vector hit_p;
-	Object* obj = NULL;
-	Object* min_obj = NULL;
-
-	float min_t = FLT_MAX;
-	float t = FLT_MAX;
-
-	for (int i = 0; i < scene->getNumObjects(); i++) {
-		Object* curObject = scene->getObject(i);
-		if (curObject->intercepts(ray, t) && (t < min_t)) {
-			min_obj = curObject;
-			min_t = t;
-		}
-	}
-
-	if (min_obj == NULL) {
-		if (scene->GetSkyBoxFlg()) return scene->GetSkyboxColor(ray);
-		else return scene->GetBackgroundColor();
-	}
-
-	Material* mat = min_obj->GetMaterial();
-	Color color = Color();
-	Color diffuse = Color();
-	Color specular = Color();
-
-	Vector beforeOffset = ray.origin + ray.direction * min_t;
-	Vector intercept = beforeOffset + min_obj->getNormal(beforeOffset) * 0.0001;
-	Vector normal = min_obj->getNormal(intercept);
-
-	for (int i = 0; i < scene->getNumLights(); i++) {
-		Light* curLight = scene->getLight(i);
-		Vector L = (curLight->position - intercept).normalize();
-		Ray feeler = Ray(intercept, L);
-		bool inShadow = false;
-		for (int j = 0; j < scene->getNumObjects(); j++) {
-			obj = scene->getObject(j);
-			if (obj->intercepts(feeler, t)) {
-				inShadow = true;
-				break;
-			}
-		}
-		Vector temp = ((L + (ray.direction * -1)) / 2).normalize();
-		if (!inShadow) {
-			diffuse += (curLight->color * mat->GetDiffColor()) * (max(0, normal * L));
-			specular += (curLight->color * mat->GetSpecColor()) * pow(max(0, temp * normal), mat->GetShine());
-		}
-	}
-	color += diffuse * mat->GetDiffuse() + specular * mat->GetSpecular();
-
-	if (depth >= MAX_DEPTH) return color;
-
-	// Reflection
-	Color reflection = Color();
-	if (mat->GetReflection() > 0) {
-		Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
-		Ray reflectionRay = Ray(intercept, rayDirection);
-		reflection = rayTracing(reflectionRay, depth + 1, ior_1);
-	}
-
-	// Refraction
-	float kr = 0;
-	Vector view = ray.direction * -1;
-	Vector viewNormal = (normal * (view * normal));
-	Vector viewTangent = viewNormal - view;
-	Color refraction = Color();
-	if (mat->GetTransmittance() == 0)
-		kr = mat->GetSpecular();
-	else {
-		float ni = ior_1;
-		float nt = mat->GetRefrIndex();
-		float r0 = pow( (ni - nt) / (ni + nt), 2);
-		float cos0i = viewNormal.length();
-		float sin0t = (ior_1 / nt) * viewTangent.length();
-		float cos0t = sqrt(1 - pow(sin0t, 2));
-		Vector refractionDirection = (viewTangent.normalize() * sin0t + normal * (-cos0t)).normalize();
-		Vector refractionInterception = beforeOffset + refractionDirection * 0.0001;
-		Ray refractedRay = Ray(refractionInterception, refractionDirection);
-		refraction = rayTracing(refractedRay, depth + 1, nt);
-		if (ni > nt)
-			kr = r0 + ((1 - r0) * pow(1 - cos0t, 5));
-		else
-			kr = r0 + ((1 - r0) * pow(1 - cos0i, 5));
-	}
-
-	color += reflection * kr + refraction * (1 - kr);
-	return color;
+//Auxiliary function -> calculates adjusted intersection point
+Vector offsetIntersection(Vector inter, Vector normal) {
+	return  inter + normal * .0001;
 }
 
+float remap(float min1, float max1, float min2, float max2, float value) {
+
+	return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+
+//Main ray tracing function (index of refraction of medium 1 where the ray is travelling)
+Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool inside = false)
+{
+	Object* closestObj = NULL;
+	float t = FLT_MAX, minT = FLT_MAX;
+
+	for (int i = 0; i < scene->getNumObjects(); i++) {
+		Object* currentObj = scene->getObject(i);
+		if (currentObj->intercepts(ray, t) && (t < minT)) {
+			closestObj = currentObj;
+			minT = t;
+		}
+	}
+
+	if (closestObj == NULL) {
+		if (scene->GetSkyBoxFlg())
+			return scene->GetSkyboxColor(ray);
+		else
+			return scene->GetBackgroundColor();
+	} else {
+		Material* mat = closestObj->GetMaterial();
+		Color color = Color();
+		Vector interceptionWithoutPrecision = ray.origin + ray.direction * minT;
+		Vector intercept = interceptionWithoutPrecision + closestObj->getNormal(interceptionWithoutPrecision) * 0.0001;
+		Vector normal = closestObj->getNormal(intercept);
+		if (!inside) {
+			for (int i = 0; i < scene->getNumLights(); i++) {
+				Light* currentLight = scene->getLight(i);
+				Vector L;
+				if (antiAliasing && softShadows) {
+					unsigned int spp = scene->GetSamplesPerPixel();
+					Vector pos = Vector(
+						currentLight->position.x + .5f + (i + rand_float()) / spp,
+						currentLight->position.y + .5f * (j + rand_float()) / spp,
+						currentLight->position.z);
+					L = (pos - intercept).normalize();
+				}
+				else {
+					L = (currentLight->position - intercept).normalize();
+				}
+				Ray feeler = Ray(intercept, L);
+				bool inShadow = false;
+				for (int j = 0; j < scene->getNumObjects(); j++) {
+					Object* currentObj = scene->getObject(j);
+					if (currentObj->intercepts(feeler, t)) {
+						inShadow = true;
+						break;
+					}
+				}
+				if (!inShadow) {
+					Vector temp = ((L + (ray.direction * -1)) / 2).normalize();
+					Color diffuse = (currentLight->color * mat->GetDiffColor()) * (max(0, normal * L)) * mat->GetDiffuse();
+					Color specular = (currentLight->color * mat->GetSpecColor()) * pow(max(0, temp * normal), mat->GetShine()) * mat->GetSpecular();
+					color += diffuse + specular;
+				}
+			}
+		}
+
+		if (depth >= MAX_DEPTH) 
+			return color;
+
+		normal = !inside ? normal : normal * -1;
+		float Kr = 0;
+
+		Color rColor = Color();
+		if (mat->GetReflection() > 0) {
+			Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
+			Ray rRay = Ray(intercept, rayDirection);
+			rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);
+		}
+
+		Color tColor = Color();
+		Vector view = ray.direction * -1;
+		Vector viewNormal = (normal * (view * normal));
+		Vector viewTangent = viewNormal - view;
+
+		if (mat->GetTransmittance() == 0) {
+			Kr = mat->GetSpecular();
+		}
+		else {
+			float ni = ior_1;
+			float nt = mat->GetRefrIndex();
+			float n = !inside ? ni / nt : ni / 1;
+			float r0 = pow((ni - nt) / (ni + nt), 2);
+			float cos0i = viewNormal.length();
+			float sin0t = n * viewTangent.length();
+			float cos0t = 1 - pow(sin0t, 2);
+			if (cos0t >= 0) {
+				cos0t = sqrt(cos0t);
+				Vector refractionDirection = (viewTangent.normalize() * sin0t + normal * (-cos0t)).normalize();
+				Vector refractionInterception = interceptionWithoutPrecision + refractionDirection * 0.0001;
+				Ray tRay = Ray(refractionInterception, refractionDirection);
+				float newNi = !inside ? mat->GetRefrIndex() : 1;
+				tColor = rayTracing(tRay, depth + 1, newNi, i, j, !inside);
+			}
+			if (ni > nt)
+				Kr = r0 + ((1 - r0) * pow(1 - cos0t, 5));
+			else
+				Kr = r0 + ((1 - r0) * pow(1 - cos0i, 5));
+		}
+		color += rColor * Kr + tColor * (1 - Kr);
+		return color;
+	}
+}
 
 // Render function by primary ray casting from the eye towards the scene's objects
 
@@ -557,19 +584,66 @@ void renderScene()
 		scene->GetCamera()->SetEye(Vector(camX, camY, camZ));  //Camera motion
 	}
 
+	unsigned int spp = scene->GetSamplesPerPixel();
+	if (softShadows && !antiAliasing) {
+		vector<Light*> new_lights;
+		float step = 0.5f / spp;
+		float start = -0.5f / 2 + step / 2;
+		float end = 0.5f / 2;
+
+		for (int k = 0; k < scene->getNumLights(); k++) {
+			Light* currentLight = scene->getLight(k);
+			float v = (spp * spp);
+			Color avg_col = Color(currentLight->color.r() / v, currentLight->color.g() / v, currentLight->color.b() / v);
+
+			for (float i = start; i < end; i += step) {
+				for (float j = start; j < end; j += step) {
+					Vector pos = Vector(currentLight->position.x + i, currentLight->position.y + j, currentLight->position.z);
+					new_lights.push_back(new Light(pos, avg_col));
+				}
+			}
+		}
+		scene->setLights(new_lights);
+	}
+
 	for (int y = 0; y < RES_Y; y++)
 	{
 		for (int x = 0; x < RES_X; x++)
 		{
-			Color color;
+			Color color = Color();
 
 			Vector pixel;  //viewport coordinates
-			pixel.x = x + 0.5f;
-			pixel.y = y + 0.5f;
+			Vector lens;
+			if (antiAliasing) {
+				for (int i = 0; i < spp; i++) {
+					for (int j = 0; j < spp; j++) {
+						Ray* ray = nullptr;
+						pixel.x = x + (i + rand_float()) / spp;
+						pixel.y = y + (j + rand_float()) / spp;
+						if (depthOfField) {
+							Vector sampleDisk;
+							do {
+								sampleDisk = Vector(rand_float(), rand_float(), 0.0) * 2 - Vector(1.0, 1.0, 0.0);
+							} while (sampleDisk * sampleDisk >= 1.0);
+							lens = sampleDisk;
+							ray = &scene->GetCamera()->PrimaryRay(lens, pixel);
+						} else {
+							ray = &scene->GetCamera()->PrimaryRay(pixel);
+						}
+						
+						color += rayTracing(*ray, 1, 1.0, i, j).clamp();
+					}
+				}
+				float v = (spp * spp);
+				color = Color(color.r() / v, color.g() / v, color.b() / v);
+			} else {
+				pixel.x = x + 0.5f;
+				pixel.y = y + 0.5f;
 
-			Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
+				Ray ray = scene->GetCamera()->PrimaryRay(pixel);   //function from camera.h
 
-			color = rayTracing(ray, 1, 1.0).clamp();
+				color += rayTracing(ray, 1, 1.0).clamp();
+			}
 
 			img_Data[counter++] = u8fromfloat((float)color.r());
 			img_Data[counter++] = u8fromfloat((float)color.g());
@@ -600,7 +674,6 @@ void renderScene()
 		printf("Image file created\n");
 	}
 }
-
 
 ///////////////////////////////////////////////////////////////////////  SETUP     ///////////////////////////////////////////////////////
 
@@ -676,7 +749,7 @@ void init_scene(void)
 	printf("\nResolutionX = %d  ResolutionY= %d.\n", RES_X, RES_Y);
 
 	// Pixel buffer to be used in the Save Image function
-	img_Data = (uint8_t*)malloc(3 * RES_X*RES_Y * sizeof(uint8_t));
+	img_Data = (uint8_t*)malloc(3 * RES_X * RES_Y * sizeof(uint8_t));
 	if (img_Data == NULL) exit(1);
 
 	Accel_Struct = scene->GetAccelStruct();   //Type of acceleration data structure
@@ -724,7 +797,7 @@ int main(int argc, char* argv[])
 	}
 	ilInit();
 
-	int 
+	int
 		ch;
 	if (!drawModeEnabled) {
 
@@ -741,14 +814,14 @@ int main(int argc, char* argv[])
 			delete(scene);
 			free(img_Data);
 			ch = _getch();
-		} while((toupper(ch) == 'Y')) ;
+		} while ((toupper(ch) == 'Y'));
 	}
 
 	else {   //Use OpenGL to draw image in the screen
 		printf("OPENGL DRAWING MODE\n\n");
 		init_scene();
-		size_vertices = 2 * RES_X*RES_Y * sizeof(float);
-		size_colors = 3 * RES_X*RES_Y * sizeof(float);
+		size_vertices = 2 * RES_X * RES_Y * sizeof(float);
+		size_colors = 3 * RES_X * RES_Y * sizeof(float);
 		vertices = (float*)malloc(size_vertices);
 		if (vertices == NULL) exit(1);
 		colors = (float*)malloc(size_colors);
