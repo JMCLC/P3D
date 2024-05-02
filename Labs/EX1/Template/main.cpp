@@ -31,10 +31,10 @@ bool drawModeEnabled = false;
 
 bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
-bool antiAliasing = false;
-bool softShadows = false;
+bool antiAliasing = true;
+bool softShadows = true;
 bool depthOfField = false;
-bool fuzzyReflection = true;
+bool fuzzyReflection = false;
 float roughnessParam = 0.3;
 
 #define MAX_DEPTH 4  //number of bounces
@@ -463,7 +463,8 @@ void setupGLUT(int argc, char* argv[])
 Vector rand_in_unit_sphere(Vector p) {
 	random_device rd;
 	mt19937 gen(rd());
-	uniform_real_distribution<float> rand(-1.0, 1.0);
+	//uniform_real_distribution<float> rand(-1.0, 1.0);
+	uniform_real_distribution<float> rand(0, 1.0);
 	return Vector(p.x + rand(gen), p.y + rand(gen), p.z + rand(gen));
 }
 
@@ -471,13 +472,22 @@ Vector rand_in_unit_sphere(Vector p) {
 Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool inside = false)
 {
 	Object* closestObj = NULL;
+	Vector hitPoint;
 	float t = FLT_MAX, minT = FLT_MAX;
 
-	for (int i = 0; i < scene->getNumObjects(); i++) {
-		Object* currentObj = scene->getObject(i);
-		if (currentObj->intercepts(ray, t) && (t < minT)) {
-			closestObj = currentObj;
-			minT = t;
+	if (Accel_Struct == GRID_ACC) {
+		if (!grid_ptr->Traverse(ray, &closestObj, hitPoint))
+			closestObj = NULL;
+	} else if (Accel_Struct == BVH_ACC) {
+		if (!bvh_ptr->Traverse(ray, &closestObj, hitPoint))
+			closestObj = NULL;
+	} else {
+		for (int i = 0; i < scene->getNumObjects(); i++) {
+			Object* currentObj = scene->getObject(i);
+			if (currentObj->intercepts(ray, t) && (t < minT)) {
+				closestObj = currentObj;
+				minT = t;
+			}
 		}
 	}
 
@@ -489,7 +499,9 @@ Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool ins
 	} else {
 		Material* mat = closestObj->GetMaterial();
 		Color color = Color();
-		Vector interceptionWithoutPrecision = ray.origin + ray.direction * minT;
+
+		//Vector interceptionWithoutPrecision = ray.origin + ray.direction * minT;
+		Vector interceptionWithoutPrecision = (Accel_Struct == NONE) ? ray.origin + ray.direction * minT : hitPoint;
 		Vector intercept = interceptionWithoutPrecision + closestObj->getNormal(interceptionWithoutPrecision) * 0.0001;
 		Vector normal = closestObj->getNormal(intercept);
 		if (!inside) {
@@ -509,11 +521,19 @@ Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool ins
 				}
 				Ray feeler = Ray(intercept, L);
 				bool inShadow = false;
-				for (int j = 0; j < scene->getNumObjects(); j++) {
-					Object* currentObj = scene->getObject(j);
-					if (currentObj->intercepts(feeler, t)) {
+				if (Accel_Struct == GRID_ACC) {
+					if (grid_ptr->Traverse(feeler))
 						inShadow = true;
-						break;
+				} else if (Accel_Struct == BVH_ACC) {
+					if (bvh_ptr->Traverse(feeler))
+						inShadow = true;
+				} else {
+					for (int j = 0; j < scene->getNumObjects(); j++) {
+						Object* currentObj = scene->getObject(j);
+						if (currentObj->intercepts(feeler, t)) {
+							inShadow = true;
+							break;
+						}
 					}
 				}
 				if (!inShadow) {
@@ -537,19 +557,20 @@ Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool ins
 			Ray rRay = Ray(intercept, rayDirection);
 			if (fuzzyReflection){
 				Vector v = rand_in_unit_sphere(intercept + rayDirection);
-				printf("Vector v: %v", v);
+				//printf("Vector v: [%f, %f, %f] \n", v.x, v.y, v.z);
 				Vector s = intercept + r + v * roughnessParam;
 				Vector direction = s - intercept = ((rayDirection + v) * roughnessParam).normalize();
-				Ray fuzzyRay = Ray(intercept, direction);
-				float v2 = ray.direction * normal;
-				bool test = v2 > 0;
-				printf("Fuzzy Calculation: %f", v);
-				if (test) {
-					printf("It is a fuzzy Reflection");
-					rColor = rayTracing(fuzzyRay, depth + 1, ior_1, i, j, inside);
-				} else {
+				//Ray fuzzyRay = Ray(intercept, direction);
+				//printf("Vector Direction: [%f, %f, %f] \n", direction.x, direction.y, direction.z);
+				//float v2 = ray.direction * normal;
+				//bool test = v2 > 0;
+				//printf("Fuzzy Calculation: %f \n", v2);
+				//if (test) {
+				//	printf("It is a fuzzy Reflection");
+				//	rColor = rayTracing(fuzzyRay, depth + 1, ior_1, i, j, inside);
+				//} else {
 					rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);
-				}
+				//}
 			}
 			else {
 				rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);

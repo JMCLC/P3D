@@ -16,8 +16,16 @@ Triangle::Triangle(Vector& P0, Vector& P1, Vector& P2)
 	normal.normalize();
 
 	//YOUR CODE to Calculate the Min and Max for bounding box
-	Min = Vector(+FLT_MAX, +FLT_MAX, +FLT_MAX);
-	Max = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	float x0 = min(min(P0.x, P1.x), P2.x);
+	float y0 = min(min(P0.y, P1.y), P2.y);
+	float z0 = min(min(P0.z, P1.z), P2.z);
+
+	float x1 = max(max(P0.x, P1.x), P2.x);
+	float y1 = max(max(P0.y, P1.y), P2.y);
+	float z1 = max(max(P0.z, P1.z), P2.z);
+
+	Min = Vector(x0, y0, z0);
+	Max = Vector(x1, y1, z1);
 
 
 	// enlarge the bounding box a bit just in case...
@@ -40,7 +48,44 @@ Vector Triangle::getNormal(Vector point)
 
 bool Triangle::intercepts(Ray& r, float& t ) {
 
-	//PUT HERE YOUR CODE
+	Vector P0 = points[0], P1 = points[1], P2 = points[2];
+
+	float a = P0.x - P1.x, b = P0.x - P2.x, c = r.direction.x, d = P0.x - r.origin.x;
+	float e = P0.y - P1.y, f = P0.y - P2.y, g = r.direction.y, h = P0.y - r.origin.y;
+	float i = P0.z - P1.z, j = P0.z - P2.z, k = r.direction.z, l = P0.z - r.origin.z;
+
+	float m = f * k - g * j, n = h * k - g * l, p = f * l - h * j;
+	float q = g * i - e * k, s = e * j - f * i;
+
+	float inv_denom = 1.0 / (a * m + b * q + c * s);
+
+	float e1 = d * m - b * n - c * p;
+	float beta = e1 * inv_denom;
+
+	if (beta < 0.0) {
+		return (false);
+	}
+
+	float r2 = r2 = e * l - h * i;
+	float e2 = a * n + d * q + c * r2;
+	float gamma = e2 * inv_denom;
+
+	if (gamma < 0.0) {
+		return (false);
+	}
+
+	if (beta + gamma > 1.0) {
+		return (false);
+	}
+
+	float e3 = a * p - b * r2 + d * s;
+	float time = e3 * inv_denom;
+
+	if (time < 0.0001) {
+		return (false);
+	}
+
+	t = time;
 	return (false);
 }
 
@@ -156,6 +201,8 @@ AABB Sphere::GetBoundingBox() {
 	Vector a_max ;
 
 	//PUT HERE YOUR CODE
+	a_min = (center - Vector(radius, radius, radius));
+	a_max = (center + Vector(radius, radius, radius));
 	return(AABB(a_min, a_max));
 }
 
@@ -172,12 +219,52 @@ AABB aaBox::GetBoundingBox() {
 bool aaBox::intercepts(Ray& ray, float& t)
 {
 	//PUT HERE YOUR CODE
-		return (false);
+	if (this->GetBoundingBox().intercepts(ray, t)) {
+		return true;
+	}
+
+	return false;
 }
 
 Vector aaBox::getNormal(Vector point)
 {
-	return Normal;
+	Vector center = (max + min) / 2;
+	Vector co = point - center;
+	Vector norm;
+	int dir; // 0 -> x, 1 -> y, 2 -> z
+
+	if (fabs(co.x) > fabs(co.y)) {
+		dir = 0;
+	}
+	else {
+		dir = 1;
+	}
+
+	if (dir == 0 && fabs(co.z) > fabs(co.x)) {
+		dir = 2;
+	}
+	else if (dir == 1 && fabs(co.z) > fabs(co.y)) {
+		dir = 2;
+	}
+
+	switch (dir)
+	{
+	case 0:
+		if (co.x >= 0) norm = Vector(1, 0, 0);
+		else norm = Vector(-1, 0, 0);
+		break;
+	case 1:
+		if (co.y >= 0) norm = Vector(0, 1, 0);
+		else norm = Vector(0, -1, 0);
+		break;
+	case 2:
+		if (co.z >= 0) norm = Vector(0, 0, 1);
+		else norm = Vector(0, 0, -1);
+		break;
+	}
+
+	return norm;
+	//return Normal;
 }
 
 Scene::Scene()
