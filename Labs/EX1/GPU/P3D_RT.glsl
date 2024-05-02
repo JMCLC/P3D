@@ -11,14 +11,14 @@ bool hit_world(Ray r, float tmin, float tmax, out HitRecord rec)
 {
     bool hit = false;
     rec.t = tmax;
-   
-    if(hit_triangle(createTriangle(vec3(-10.0, -0.01, 10.0), vec3(10.0, -0.01, 10.0), vec3(-10.0, -0.01, -10.0)), r, tmin, rec.t, rec))
+
+    if(hit_triangle(createTriangle(vec3(-10.0, -0.05, 10.0), vec3(10.0, -0.05, 10.0), vec3(-10.0, -0.05, -10.0)), r, tmin, rec.t, rec))
     {
         hit = true;
         rec.material = createDiffuseMaterial(vec3(0.2));
     }
 
-    if(hit_triangle(createTriangle(vec3(-10.0, -0.01, -10.0), vec3(10.0, -0.01, 10), vec3(10.0, -0.01, -10.0)), r, tmin, rec.t, rec))
+    if(hit_triangle(createTriangle(vec3(-10.0, -0.05, -10.0), vec3(10.0, -0.05, 10), vec3(10.0, -0.05, -10.0)), r, tmin, rec.t, rec))
     {
         hit = true;
         rec.material = createDiffuseMaterial(vec3(0.2));
@@ -48,27 +48,51 @@ bool hit_world(Ray r, float tmin, float tmax, out HitRecord rec)
     }
 
     if(hit_sphere(
-        createSphere(vec3(0.0, 1.0, 0.0), 1.0),
+        createSphere(vec3(-1.5, 1.0, 0.0), 1.0),
         r,
         tmin,
         rec.t,
         rec))
     {
         hit = true;
-        rec.material = createDialectricMaterial(vec3(0.0), 1.333, 0.0);
+        rec.material = createDialectricMaterial(vec3(0.0), 1.3, 0.0);
     }
 
-if(hit_sphere(
-        createSphere(vec3(0.0, 1.0, 0.0), -0.95),
+    if(hit_sphere(
+        createSphere(vec3(-1.5, 1.0, 0.0), -0.55),
         r,
         tmin,
         rec.t,
         rec))
     {
         hit = true;
-        rec.material = createDialectricMaterial(vec3(0.0), 1.333, 0.0);
+        rec.material = createDialectricMaterial(vec3(0.0), 1.3, 0.0);
     }
+
+    if(hit_sphere(
+        createSphere(vec3(1.5, 1.0, 0.0), 1.0),
+        r,
+        tmin,
+        rec.t,
+        rec))
+    {
+        hit = true;
+        rec.material = createDialectricMaterial(vec3(0.0, 0.7, 0.9), 1.05, 0.0);
+    }
+
+    if(hit_box(
+        createBox(vec3(0.0, 2.0, 0.0), vec3(1.0, 3.0, 1.0)),
+        r,
+        tmin,
+        rec.t,
+        rec))
+    {
+        hit = true;
+        rec.material = createMetalMaterial(vec3(1.0, 0.0, 0.5), 0.0);
+    }
+    
    
+
     int numxy = 5;
     
     for(int x = -numxy; x < numxy; ++x)
@@ -154,7 +178,7 @@ if(hit_sphere(
                     {
                         hit = true;
                         rec.material.type = MT_DIALECTRIC;
-                        rec.material = createDialectricMaterial(hash3(seed), 1.2, 0.0);
+                        rec.material = createDialectricMaterial(hash3(seed), 1.5, 0.0);
                     }
                 }
             }
@@ -165,11 +189,45 @@ if(hit_sphere(
 
 vec3 directlighting(pointLight pl, Ray r, HitRecord rec){
     vec3 diffCol, specCol;
-    vec3 colorOut = vec3(0.0, 0.0, 0.0);
+    vec3 colorOut = vec3(0.0, 0.0, 0.0); 
     float shininess;
     HitRecord dummy;
 
-   //INSERT YOUR CODE HERE
+
+    vec3 L = normalize(pl.pos - rec.pos);
+    float Ldistance = length(pl.pos - rec.pos);
+    vec3 N = rec.normal;
+
+    Ray shadowRay = createRay(rec.pos + epsilon * N , L);
+
+    if (max(dot(N, L), 0.0) > 0.0) {
+        if (!hit_world(shadowRay, 0.0, Ldistance, dummy)) {
+            // Diffuse material diffuse and specular components
+            if (rec.material.type == MT_DIFFUSE) {
+                shininess = 10.0;
+                diffCol = rec.material.albedo / pi * max(dot(N, L), 0.0);
+                specCol = vec3(0.1);
+            }
+            // Metal material diffuse and specular components
+            if (rec.material.type == MT_METAL) {
+                shininess = 100.0;
+                diffCol = vec3(0.0);
+                specCol = rec.material.albedo;
+            }
+            // Dialectric material diffuse and specular components
+            if (rec.material.type == MT_DIALECTRIC) {
+                shininess = 300.0;
+                diffCol = vec3(0.0);
+                specCol = vec3(0.1);
+            }
+
+            // Calculation of specular intensity with halfwayVector
+            vec3 H = normalize(L - r.d);
+            vec3 specular = specCol * pow(max(dot(H, N), 0.0), shininess);
+            // Final local color with diffuse and specular components
+            colorOut = (diffCol + specular) * pl.color;
+       }
+    }
     
 	return colorOut; 
 }
@@ -181,24 +239,27 @@ vec3 rayColor(Ray r)
     HitRecord rec;
     vec3 col = vec3(0.0);
     vec3 throughput = vec3(1.0f, 1.0f, 1.0f);
+
     for(int i = 0; i < MAX_BOUNCES; ++i)
     {
-        if(hit_world(r, 0.001, 10000.0, rec))
-        {
+        if(hit_world(r, 0.001, 10000.0, rec)) {
             //calculate direct lighting with 3 white point lights:
-            {
-                //createPointLight(vec3(-10.0, 15.0, 0.0), vec3(1.0, 1.0, 1.0))
-                //createPointLight(vec3(8.0, 15.0, 3.0), vec3(1.0, 1.0, 1.0))
-                //createPointLight(vec3(1.0, 15.0, -9.0), vec3(1.0, 1.0, 1.0))
-
-                //for instance: col += directlighting(createPointLight(vec3(-10.0, 15.0, 0.0), vec3(1.0, 1.0, 1.0)), r, rec) * throughput;
-            }
+            col += directlighting(createPointLight(vec3(-10.0, 15.0, 0.0), vec3(1.0, 1.0, 1.0)), r, rec)* throughput;
+            col += directlighting(createPointLight(vec3(8.0, 15.0, 3.0), vec3(1.0, 1.0, 1.0)), r, rec)* throughput;
+            col += directlighting(createPointLight(vec3(1.0, 15.0, -9.0), vec3(1.0, 1.0, 1.0)), r, rec)* throughput;
+        
            
             //calculate secondary ray and update throughput
             Ray scatterRay;
             vec3 atten;
-            if(scatter(r, rec, atten, scatterRay))
-            {   //  insert your code here    }
+            if(scatter(r, rec, atten, scatterRay)){
+                //  insert your code here    
+                r = scatterRay;
+                throughput *= atten;
+            }
+            else{
+                return vec3(0.0);
+            }
         
         }
         else  //background
@@ -238,7 +299,7 @@ void main()
         time0,
         time1);
 
-//usa-se o 4 canal de cor para guardar o numero de samples e não o iFrame pois quando se mexe o rato faz-se reset
+    //usa-se o 4 canal de cor para guardar o numero de samples e não o iFrame pois quando se mexe o rato faz-se reset
 
     vec4 prev = texture(iChannel0, gl_FragCoord.xy / iResolution.xy);
     vec3 prevLinear = toLinear(prev.xyz);  
