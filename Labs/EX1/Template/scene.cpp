@@ -47,46 +47,88 @@ Vector Triangle::getNormal(Vector point)
 //
 
 bool Triangle::intercepts(Ray& r, float& t ) {
+	r.direction.normalize();
 
-	Vector P0 = points[0], P1 = points[1], P2 = points[2];
+	//reference: scratch a pixel
+	//any point works
+	//TODO: CAN THIS BE DONE LIKE THIS?
 
-	float a = P0.x - P1.x, b = P0.x - P2.x, c = r.direction.x, d = P0.x - r.origin.x;
-	float e = P0.y - P1.y, f = P0.y - P2.y, g = r.direction.y, h = P0.y - r.origin.y;
-	float i = P0.z - P1.z, j = P0.z - P2.z, k = r.direction.z, l = P0.z - r.origin.z;
+	float vd = r.direction * normal;
 
-	float m = f * k - g * j, n = h * k - g * l, p = f * l - h * j;
-	float q = g * i - e * k, s = e * j - f * i;
+	//ray is parallel to triangle
+	if (vd == 0)
+		return false;
 
-	float inv_denom = 1.0 / (a * m + b * q + c * s);
+	float D = -(normal * points[0]);
+	float v0 = -(normal * r.origin + D);
 
-	float e1 = d * m - b * n - c * p;
-	float beta = e1 * inv_denom;
+	t = v0 / vd;
 
-	if (beta < 0.0) {
-		return (false);
-	}
+	if (t < 0)
+		return false;
 
-	float r2 = r2 = e * l - h * i;
-	float e2 = a * n + d * q + c * r2;
-	float gamma = e2 * inv_denom;
+	Vector P = r.origin + r.direction * t;
+	Vector C; //perpendicular to triangle
 
-	if (gamma < 0.0) {
-		return (false);
-	}
+	//In case any error happens check edge directions are correct
+	// edge 0
+	Vector edge0 = points[1] - points[0];
+	Vector vp0 = P - points[0];
+	C = edge0 % vp0;
+	if (normal * C < 0) return false;
 
-	if (beta + gamma > 1.0) {
-		return (false);
-	}
+	// edge 1
+	Vector edge1 = points[2] - points[1];
+	Vector vp1 = P - points[1];
+	C = edge1 % vp1;
+	if (normal * C < 0)  return false;
 
-	float e3 = a * p - b * r2 + d * s;
-	float time = e3 * inv_denom;
+	// edge 2
+	Vector edge2 = points[0] - points[2];
+	Vector vp2 = P - points[2];
+	C = edge2 % vp2;
+	if (normal * C < 0) return false;
 
-	if (time < 0.0001) {
-		return (false);
-	}
+	return true; // this ray hits the triangle
+	//Vector P0 = points[0], P1 = points[1], P2 = points[2];
 
-	t = time;
-	return (false);
+	//float a = P0.x - P1.x, b = P0.x - P2.x, c = r.direction.x, d = P0.x - r.origin.x;
+	//float e = P0.y - P1.y, f = P0.y - P2.y, g = r.direction.y, h = P0.y - r.origin.y;
+	//float i = P0.z - P1.z, j = P0.z - P2.z, k = r.direction.z, l = P0.z - r.origin.z;
+
+	//float m = f * k - g * j, n = h * k - g * l, p = f * l - h * j;
+	//float q = g * i - e * k, s = e * j - f * i;
+
+	//float inv_denom = 1.0 / (a * m + b * q + c * s);
+
+	//float e1 = d * m - b * n - c * p;
+	//float beta = e1 * inv_denom;
+
+	//if (beta < 0.0) {
+	//	return (false);
+	//}
+
+	//float r2 = r2 = e * l - h * i;
+	//float e2 = a * n + d * q + c * r2;
+	//float gamma = e2 * inv_denom;
+
+	//if (gamma < 0.0) {
+	//	return (false);
+	//}
+
+	//if (beta + gamma > 1.0) {
+	//	return (false);
+	//}
+
+	//float e3 = a * p - b * r2 + d * s;
+	//float time = e3 * inv_denom;
+
+	//if (time < 0.0001) {
+	//	return (false);
+	//}
+
+	//t = time;
+	//return (false);
 }
 
 Plane::Plane(Vector& a_PN, float a_D)

@@ -33,9 +33,9 @@ bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
 bool antiAliasing = true;
 bool softShadows = true;
-bool depthOfField = false;
-bool fuzzyReflection = false;
-float roughnessParam = 0.3;
+bool depthOfField = true;
+bool fuzzyReflection = true;
+float roughnessParam = 0.3f;
 
 #define MAX_DEPTH 4  //number of bounces
 
@@ -460,13 +460,6 @@ void setupGLUT(int argc, char* argv[])
 
 
 /////////////////////////////////////////////////////YOUR CODE HERE///////////////////////////////////////////////////////////////////////////////////////
-Vector rand_in_unit_sphere(Vector p) {
-	random_device rd;
-	mt19937 gen(rd());
-	//uniform_real_distribution<float> rand(-1.0, 1.0);
-	uniform_real_distribution<float> rand(0, 1.0);
-	return Vector(p.x + rand(gen), p.y + rand(gen), p.z + rand(gen));
-}
 
 //Main ray tracing function (index of refraction of medium 1 where the ray is travelling)
 Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool inside = false)
@@ -508,7 +501,7 @@ Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool ins
 			for (int i = 0; i < scene->getNumLights(); i++) {
 				Light* currentLight = scene->getLight(i);
 				Vector L;
-				if (antiAliasing && softShadows) {
+				if (antiAliasing && softShadows && scene->GetSamplesPerPixel() > 0) {
 					unsigned int spp = scene->GetSamplesPerPixel();
 					Vector pos = Vector(
 						currentLight->position.x + .5f + (i + rand_float()) / spp,
@@ -555,26 +548,14 @@ Color rayTracing(Ray ray, int depth, float ior_1, int i = 0, int j = 0, bool ins
 		if (mat->GetReflection() > 0) {
 			Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
 			Ray rRay = Ray(intercept, rayDirection);
-			if (fuzzyReflection){
-				Vector v = rand_in_unit_sphere(intercept + rayDirection);
-				//printf("Vector v: [%f, %f, %f] \n", v.x, v.y, v.z);
-				Vector s = intercept + r + v * roughnessParam;
-				Vector direction = s - intercept = ((rayDirection + v) * roughnessParam).normalize();
-				//Ray fuzzyRay = Ray(intercept, direction);
-				//printf("Vector Direction: [%f, %f, %f] \n", direction.x, direction.y, direction.z);
-				//float v2 = ray.direction * normal;
-				//bool test = v2 > 0;
-				//printf("Fuzzy Calculation: %f \n", v2);
-				//if (test) {
-				//	printf("It is a fuzzy Reflection");
-				//	rColor = rayTracing(fuzzyRay, depth + 1, ior_1, i, j, inside);
-				//} else {
-					rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);
-				//}
+			if (fuzzyReflection) {
+				Vector sphere = rnd_unit_sphere() * roughnessParam;
+				Vector direction = (rayDirection + sphere).normalize();
+				if (direction * normal >= 0) {
+					rRay = Ray(intercept, direction);
+				}
 			}
-			else {
-				rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);
-			}
+			rColor = rayTracing(rRay, depth + 1, ior_1, i, j, inside);	
 		}
 
 		Color tColor = Color();
@@ -625,7 +606,7 @@ void renderScene()
 	}
 
 	unsigned int spp = scene->GetSamplesPerPixel();
-	if (softShadows && !antiAliasing) {
+	if (softShadows && !antiAliasing && spp > 0) {
 		vector<Light*> new_lights;
 		float step = 0.5f / spp;
 		float start = -0.5f / 2 + step / 2;
@@ -653,19 +634,16 @@ void renderScene()
 			Color color = Color();
 
 			Vector pixel;  //viewport coordinates
-			Vector lens;
-			if (antiAliasing) {
+			//Vector lens;
+			if (antiAliasing && scene->GetSamplesPerPixel() > 0) {
 				for (int i = 0; i < spp; i++) {
 					for (int j = 0; j < spp; j++) {
 						Ray* ray = nullptr;
 						pixel.x = x + (i + rand_float()) / spp;
 						pixel.y = y + (j + rand_float()) / spp;
+						pixel.z = scene->GetCamera()->GetPlaneDist() * -1;
 						if (depthOfField) {
-							Vector sampleDisk;
-							do {
-								sampleDisk = Vector(rand_float(), rand_float(), 0.0) * 2 - Vector(1.0, 1.0, 0.0);
-							} while (sampleDisk * sampleDisk >= 1.0);
-							lens = sampleDisk;
+							Vector lens = rnd_unit_disk() * scene->GetCamera()->GetAperture();
 							ray = &scene->GetCamera()->PrimaryRay(lens, pixel);
 						} else {
 							ray = &scene->GetCamera()->PrimaryRay(pixel);
@@ -675,7 +653,7 @@ void renderScene()
 					}
 				}
 				float v = (spp * spp);
-				color = Color(color.r() / v, color.g() / v, color.b() / v);
+				color = color * (1 / v);
 			} else {
 				pixel.x = x + 0.5f;
 				pixel.y = y + 0.5f;
