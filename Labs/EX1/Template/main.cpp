@@ -569,12 +569,7 @@ Color rayTracing(Ray ray, int depth, float ior_1, bool inside = false)
 			Vector refractionInterception = interceptionWithoutPrecision + refractionDirection * EPSILON;
 			Ray tRay = Ray(refractionInterception, refractionDirection);
 			float newNi = !inside ? mat->GetRefrIndex() : 1;
-			//tColor = rayTracing(tRay, depth + 1, newNi, !inside);
-			Vector refractionHitPoint = hitPoint - normal * EPSILON;
-			Vector tangentVector = normal * cos0i - ray.direction * -1;
-			Vector refractionRayDirection = tangentVector * sin0t - normal * cos0t;
-			Ray refractedRay = Ray(refractionHitPoint, refractionRayDirection);
-			tColor = rayTracing(refractedRay, depth + 1, newNi);
+			tColor = rayTracing(tRay, depth + 1, newNi, !inside);
 		}
 		if (ni > nt)
 			Kr = r0 + ((1 - r0) * pow(1 - cos0t, 5));
