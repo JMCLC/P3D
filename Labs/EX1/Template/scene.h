@@ -59,30 +59,29 @@ class Light
 {
 public:
 
-	Light(Vector& pos, Color& col) : position(pos), color(col) { currentSample = 0; };
+	Light(Vector& pos, Color& col) : position(pos), color(col) {};
 
-	std::vector<int> samples;
-	int currentSample;
+	Vector sample;
+	int spl;
 	Vector position;
 	Color color;
 
-	int getCurrentSample() {
-		return currentSample;
+	void setSample(int spl) {
+		this->sample = Vector(0, 0, 0);
+		this->spl = spl;
 	}
 
 	Vector getRandomSample() {
-
-		Vector sample = Vector( samples[currentSample] % (int) sqrt(samples.size()), 0, samples[currentSample] / (int) sqrt(samples.size()));
-		currentSample = (currentSample + 1) % samples.size();
-		sample.x = sample.x * 1 / sqrt(samples.size());
-		sample.z = sample.z * 1 / sqrt(samples.size());
-		return sample;
-	}
-
-	void createSamples(int spp) {
-		samples = std::vector<int>(spp);
-		std::iota(samples.begin(), samples.end(), 1);
-		std::shuffle(samples.begin(), samples.end(), std::default_random_engine{});
+		Vector returnSample = Vector(sample.x, sample.y, sample.z);
+		if (sample.z + 1 < spl)
+			sample = Vector(sample.x, sample.y, sample.z + 1);
+		else
+			sample = Vector(sample.x + 1, sample.y, 0);
+		return Vector(
+			position.x + .5f + (returnSample.x + rand_float()) / spl,
+			position.y,
+			position.z + .5f * (returnSample.z + rand_float()) / spl
+		);
 	}
 };
 

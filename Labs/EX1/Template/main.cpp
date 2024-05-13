@@ -32,7 +32,7 @@ bool drawModeEnabled = false;
 bool P3F_scene = true; //choose between P3F scene or a built-in random scene
 
 bool antiAliasing = true;
-bool softShadows = false;
+bool softShadows = true;
 bool fuzzyReflection = false;
 float roughnessParam = 0.3f;
 
@@ -465,146 +465,124 @@ Color rayTracing(Ray ray, int depth, float ior_1, bool inside = false)
 	Object* closestObj = NULL;
 	Vector hitPoint;
 	float t = FLT_MAX, minT = FLT_MAX;
+	bool hasHit = false;
 
 	if (Accel_Struct == GRID_ACC) {
-		if (!grid_ptr->Traverse(ray, &closestObj, hitPoint))
-			closestObj = NULL;
+		hasHit = grid_ptr->Traverse(ray, &closestObj, hitPoint);
 	}
 	else if (Accel_Struct == BVH_ACC) {
-		if (!bvh_ptr->Traverse(ray, &closestObj, hitPoint))
-			closestObj = NULL;
+		hasHit = bvh_ptr->Traverse(ray, &closestObj, hitPoint);
 	}
 	else {
 		for (int i = 0; i < scene->getNumObjects(); i++) {
 			Object* currentObj = scene->getObject(i);
 			if (currentObj->intercepts(ray, t) && (t < minT)) {
+				hasHit = true;
 				closestObj = currentObj;
 				minT = t;
 			}
 		}
 	}
 
-	if (closestObj == NULL) {
-		if (scene->GetSkyBoxFlg())
-			return scene->GetSkyboxColor(ray);
-		else
-			return scene->GetBackgroundColor();
-	}
-	else {
-		Material* mat = closestObj->GetMaterial();
-		Color color = Color();
+	if (!hasHit)
+		return scene->GetSkyBoxFlg() ? scene->GetSkyboxColor(ray) : scene->GetBackgroundColor();
 
-		//Vector interceptionWithoutPrecision = ray.origin + ray.direction * minT;
-		Vector interceptionWithoutPrecision = (Accel_Struct == NONE) ? ray.origin + ray.direction * minT : hitPoint;
-		Vector intercept = interceptionWithoutPrecision + closestObj->getNormal(interceptionWithoutPrecision) * 0.0001;
-		Vector normal = closestObj->getNormal(intercept);
-		if (!inside) {
-			for (int i = 0; i < scene->getNumLights(); i++) {
-				Light* currentLight = scene->getLight(i);
-				Vector L;
-				int spp = scene->GetSamplesPerPixel();
-				if (antiAliasing && softShadows && spp > 0) {
-					//unsigned int spp = scene->GetSamplesPerPixel();
-					//Vector pos = Vector(
-					//	currentLight->position.x + .5f + (i + rand_float()) / spp,
-					//	currentLight->position.y + .5f * (j + rand_float()) / spp,
-					//	currentLight->position.z);
-					//L = (pos - intercept).normalize();
-					float rootSpp = sqrt(spp);
-					int currentSample = currentLight->getCurrentSample();
-					if (currentSample == 0)
-						currentLight->createSamples(spp);
-					Vector sample = currentLight->getRandomSample();
-					Vector pos = Vector(
-						currentLight->position.x + .5f * (sample.x + rand_float()) / rootSpp,
-						currentLight->position.y,
-						currentLight->position.z + .5f * (sample.z + rand_float()) / rootSpp);
-					L = (pos - hitPoint).normalize();
-				}
-				else {
-					L = (currentLight->position - intercept).normalize();
-				}
-				Ray feeler = Ray(intercept, L);
-				bool inShadow = false;
-				if (Accel_Struct == GRID_ACC) {
-					if (grid_ptr->Traverse(feeler))
+	Material* mat = closestObj->GetMaterial();
+	Color color = Color();
+
+	Vector interceptionWithoutPrecision = (Accel_Struct == NONE) ? ray.origin + ray.direction * minT : hitPoint;
+	Vector intercept = interceptionWithoutPrecision + closestObj->getNormal(interceptionWithoutPrecision) * EPSILON;
+	Vector normal = closestObj->getNormal(intercept);
+	if (!inside) {
+		for (int i = 0; i < scene->getNumLights(); i++) {
+			Light* currentLight = scene->getLight(i);
+			Vector L;
+			int spp = scene->GetSamplesPerPixel();
+			if (antiAliasing && softShadows && spp > 0)
+				L = (currentLight->getRandomSample() - intercept).normalize();
+			else
+				L = (currentLight->position - intercept).normalize();
+			Ray feeler = Ray(intercept, L);
+			bool inShadow = false;
+			if (Accel_Struct == GRID_ACC)
+				inShadow = grid_ptr->Traverse(feeler);
+			else if (Accel_Struct == BVH_ACC)
+				inShadow = bvh_ptr->Traverse(feeler);
+			else {
+				for (int j = 0; j < scene->getNumObjects(); j++) {
+					Object* currentObj = scene->getObject(j);
+					if (currentObj->intercepts(feeler, t)) {
 						inShadow = true;
-				}
-				else if (Accel_Struct == BVH_ACC) {
-					if (bvh_ptr->Traverse(feeler))
-						inShadow = true;
-				}
-				else {
-					for (int j = 0; j < scene->getNumObjects(); j++) {
-						Object* currentObj = scene->getObject(j);
-						if (currentObj->intercepts(feeler, t)) {
-							inShadow = true;
-							break;
-						}
+						break;
 					}
 				}
-				if (!inShadow) {
-					Vector temp = ((L + (ray.direction * -1)) / 2).normalize();
-					Color diffuse = (currentLight->color * mat->GetDiffColor()) * (max(0, normal * L)) * mat->GetDiffuse();
-					Color specular = (currentLight->color * mat->GetSpecColor()) * pow(max(0, temp * normal), mat->GetShine()) * mat->GetSpecular();
-					color += diffuse + specular;
-				}
+			}
+			if (!inShadow) {
+				Vector temp = ((L + (ray.direction * -1)) / 2).normalize();
+				Color diffuse = (currentLight->color * mat->GetDiffColor()) * (max(0, normal * L)) * mat->GetDiffuse();
+				Color specular = (currentLight->color * mat->GetSpecColor()) * pow(max(0, temp * normal), mat->GetShine()) * mat->GetSpecular();
+				color += diffuse + specular;
 			}
 		}
-
-		if (depth >= MAX_DEPTH)
-			return color;
-
-		normal = !inside ? normal : normal * -1;
-		float Kr = 0;
-
-		Color rColor = Color();
-		if (mat->GetReflection() > 0) {
-			Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
-			Ray rRay = Ray(intercept, rayDirection);
-			if (fuzzyReflection) {
-				Vector sphere = rnd_unit_sphere() * roughnessParam;
-				Vector direction = (rayDirection + sphere).normalize();
-				if (direction * normal >= 0) {
-					rRay = Ray(intercept, direction);
-				}
-			}
-			rColor = rayTracing(rRay, depth + 1, ior_1, inside);
-			rColor = rColor * mat->GetSpecColor();
-		}
-
-		Color tColor = Color();
-		Vector view = ray.direction * -1;
-		Vector viewNormal = (normal * (view * normal));
-		Vector viewTangent = viewNormal - view;
-
-		if (mat->GetTransmittance() == 0) {
-			Kr = mat->GetSpecular();
-		}
-		else {
-			float ni = ior_1;
-			float nt = mat->GetRefrIndex();
-			float n = !inside ? ni / nt : ni / 1;
-			float r0 = pow((ni - nt) / (ni + nt), 2);
-			float cos0i = viewNormal.length();
-			float sin0t = n * viewTangent.length();
-			float cos0t = 1 - pow(sin0t, 2);
-			if (cos0t >= 0) {
-				cos0t = sqrt(cos0t);
-				Vector refractionDirection = (viewTangent.normalize() * sin0t + normal * (-cos0t)).normalize();
-				Vector refractionInterception = interceptionWithoutPrecision + refractionDirection * 0.0001;
-				Ray tRay = Ray(refractionInterception, refractionDirection);
-				float newNi = !inside ? mat->GetRefrIndex() : 1;
-				tColor = rayTracing(tRay, depth + 1, newNi, !inside);
-			}
-			if (ni > nt)
-				Kr = r0 + ((1 - r0) * pow(1 - cos0t, 5));
-			else
-				Kr = r0 + ((1 - r0) * pow(1 - cos0i, 5));
-		}
-		color += rColor * Kr + tColor * (1 - Kr);
-		return color;
 	}
+
+	if (depth >= MAX_DEPTH)
+		return color;
+
+	normal = !inside ? normal : normal * -1;
+	float Kr = 0;
+
+	Color rColor = Color();
+	if (mat->GetReflection() > 0) {
+		Vector rayDirection = normal * ((ray.direction * -1) * normal) * 2 + ray.direction;
+		Ray rRay = Ray(intercept, rayDirection);
+		if (fuzzyReflection) {
+			Vector sphere = rnd_unit_sphere() * roughnessParam;
+			Vector direction = (rayDirection + sphere).normalize();
+			if (direction * normal >= 0) {
+				rRay = Ray(intercept, direction);
+			}
+		}
+		rColor = rayTracing(rRay, depth + 1, ior_1, inside);
+		rColor = rColor * mat->GetSpecColor() * mat->GetReflection();
+	}
+
+	Color tColor = Color();
+	Vector view = ray.direction * -1;
+	Vector viewNormal = (normal * (view * normal));
+	Vector viewTangent = viewNormal - view;
+
+	if (mat->GetTransmittance() == 0) {
+		Kr = mat->GetSpecular();
+	}
+	else {
+		float ni = ior_1;
+		float nt = mat->GetRefrIndex();
+		float n = !inside ? ni / nt : ni / 1;
+		float r0 = pow((ni - nt) / (ni + nt), 2);
+		float cos0i = viewNormal.length();
+		float sin0t = n * viewTangent.length();
+		float cos0t = 1 - pow(sin0t, 2);
+		if (cos0t >= 0) {
+			cos0t = sqrt(cos0t);
+			Vector refractionDirection = (viewTangent.normalize() * sin0t + normal * (-cos0t)).normalize();
+			Vector refractionInterception = interceptionWithoutPrecision + refractionDirection * EPSILON;
+			Ray tRay = Ray(refractionInterception, refractionDirection);
+			float newNi = !inside ? mat->GetRefrIndex() : 1;
+			//tColor = rayTracing(tRay, depth + 1, newNi, !inside);
+			Vector refractionHitPoint = hitPoint - normal * EPSILON;
+			Vector tangentVector = normal * cos0i - ray.direction * -1;
+			Vector refractionRayDirection = tangentVector * sin0t - normal * cos0t;
+			Ray refractedRay = Ray(refractionHitPoint, refractionRayDirection);
+			tColor = rayTracing(refractedRay, depth + 1, newNi);
+		}
+		if (ni > nt)
+			Kr = r0 + ((1 - r0) * pow(1 - cos0t, 5));
+		else
+			Kr = r0 + ((1 - r0) * pow(1 - cos0i, 5));
+	}
+	color += rColor * Kr + tColor * (1 - Kr);
+	return color;
 }
 //
 ////Main ray tracing function (index of refraction of medium 1 where the ray is travelling)
@@ -777,16 +755,20 @@ void renderScene()
 			Color color = Color();
 
 			Vector pixel;  //viewport coordinates
-			//Vector lens;
 			if (antiAliasing && spp > 0) {
+				for (int k = 0; k < scene->getNumLights(); k++) {
+					scene->getLight(k)->setSample(rootSpp);
+				}
 				for (int i = 0; i < rootSpp; i++) {
 					for (int j = 0; j < rootSpp; j++) {
 						Ray* ray = nullptr;
 						pixel.x = x + (i + rand_float()) / rootSpp;
 						pixel.y = y + (j + rand_float()) / rootSpp;
 						pixel.z = scene->GetCamera()->GetPlaneDist() * -1;
-						if (scene->GetCamera()->GetAperture() > 0) {
-							Vector lens = rnd_unit_disk() * scene->GetCamera()->GetAperture();
+
+						float aperture = scene->GetCamera()->GetAperture();
+						if (aperture > 0) {
+							Vector lens = rnd_unit_disk() * aperture;
 							ray = &scene->GetCamera()->PrimaryRay(lens, pixel);
 						}
 						else {
