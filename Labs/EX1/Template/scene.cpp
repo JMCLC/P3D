@@ -260,8 +260,89 @@ AABB aaBox::GetBoundingBox() {
 
 bool aaBox::intercepts(Ray& ray, float& t)
 {
-	//PUT HERE YOUR CODE
-	if (this->GetBoundingBox().intercepts(ray, t)) {
+	ray.direction.normalize();
+
+	//tirado dos slides (?)
+	double tx_min = 0, ty_min = 0, tz_min = 0;
+	double tx_max = 0, ty_max = 0, tz_max = 0;
+
+	double a = 1.0 / ray.direction.x;
+
+	if (a >= 0) {
+		tx_min = (min.x - ray.origin.x) * a;
+		tx_max = (max.x - ray.origin.x) * a;
+	}
+	else {
+		tx_min = (max.x - ray.origin.x) * a;
+		tx_max = (min.x - ray.origin.x) * a;
+	}
+
+	double b = 1.0 / ray.direction.y;
+	if (b >= 0) {
+		ty_min = (min.y - ray.origin.y) * b;
+		ty_max = (max.y - ray.origin.y) * b;
+	}
+	else {
+		ty_min = (max.y - ray.origin.y) * b;
+		ty_max = (min.y - ray.origin.y) * b;
+	}
+
+	double c = 1.0 / ray.direction.z;
+	if (c >= 0) {
+		tz_min = (min.z - ray.origin.z) * c;
+		tz_max = (max.z - ray.origin.z) * c;
+	}
+	else {
+		tz_min = (max.z - ray.origin.z) * c;
+		tz_max = (min.z - ray.origin.z) * c;
+	}
+
+
+	float tE, tL; //entering and leaving t values 
+	Vector face_in, face_out; // normals
+	// find largest tE, entering t value
+
+	if (tx_min > ty_min) {
+		tE = tx_min;
+		face_in = (a >= 0.0) ? Vector(-1, 0, 0) : Vector(1, 0, 0);
+	}
+	else {
+		tE = ty_min;
+		face_in = (b >= 0.0) ? Vector(0, -1, 0) : Vector(0, 1, 0);
+	}
+
+	if (tz_min > tE) {
+		tE = tz_min;
+		face_in = (c >= 0.0) ? Vector(0, 0, -1) : Vector(0, 0, 1);
+	}
+
+
+	// find smallest tL, leaving t value
+	if (tx_max < ty_max) {
+		tL = tx_max;
+		face_out = (a >= 0.0) ? Vector(1, 0, 0) : Vector(-1, 0, 0);
+	}
+	else {
+		tL = ty_max;
+		face_out = (b >= 0.0) ? Vector(0, 1, 0) : Vector(0, -1, 0);
+	}
+
+	if (tz_max < tL) {
+		tL = tz_max;
+		face_out = (c >= 0.0) ? Vector(0, 0, 1) : Vector(0, 0, -1);
+	}
+	//printf("tE = %f, tL = %f\n", tE, tL);
+
+	if (tE < tL && tL > 0) { // condition for a hit
+		if (tE > 0) {
+			t = tE; // ray hits outside surface
+			Normal = face_in;
+		}
+		else {
+			t = tL; // ray hits inside surface
+			Normal = face_out;
+		}
+
 		return true;
 	}
 
@@ -270,43 +351,7 @@ bool aaBox::intercepts(Ray& ray, float& t)
 
 Vector aaBox::getNormal(Vector point)
 {
-	Vector center = (max + min) / 2;
-	Vector co = point - center;
-	Vector norm;
-	int dir; // 0 -> x, 1 -> y, 2 -> z
-
-	if (fabs(co.x) > fabs(co.y)) {
-		dir = 0;
-	}
-	else {
-		dir = 1;
-	}
-
-	if (dir == 0 && fabs(co.z) > fabs(co.x)) {
-		dir = 2;
-	}
-	else if (dir == 1 && fabs(co.z) > fabs(co.y)) {
-		dir = 2;
-	}
-
-	switch (dir)
-	{
-	case 0:
-		if (co.x >= 0) norm = Vector(1, 0, 0);
-		else norm = Vector(-1, 0, 0);
-		break;
-	case 1:
-		if (co.y >= 0) norm = Vector(0, 1, 0);
-		else norm = Vector(0, -1, 0);
-		break;
-	case 2:
-		if (co.z >= 0) norm = Vector(0, 0, 1);
-		else norm = Vector(0, 0, -1);
-		break;
-	}
-
-	return norm;
-	//return Normal;
+	return Normal;
 }
 
 Scene::Scene()
