@@ -43,4 +43,4 @@ transparent materials
 5. Depth-of-Field
 6. Beer’s law for light absorption inside a transparent dieletric 
 
-![pathtracer](https://cdn.discordapp.com/attachments/1077928687447572513/1239698009525059594/image.png?ex=6643de3d&is=66428cbd&hm=1ea28218599eda09af6ca5079f5d02eea864d46d88dd08af428c627e88f7bc23&)
+![pathtracer](https://cdn.discordapp.com/attachments/1077928687447572513/1239698009525059594/image.png?ex=664a75bd&is=6649243d&hm=3288924bb3daac57be7e3c99116e3685ba2c4a3f4e010e7248b12e9543da5e72&)
