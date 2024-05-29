@@ -11,7 +11,7 @@
     4. Global color component by implementing the mirror reflection and refraction with
 Schlick approximation of Fresnel Equations for dieletric materials
 
-![balls_high]("1º Project/Previews/balls_high.png")
+![balls_high](1º Project/Previews/balls_high.png)
 
 2. Stochastic sampling techniques
     1. Anti-aliasing with the jittered method
@@ -20,13 +20,13 @@ antialiasing) and the random method (with antialiasing)
     3. Depth of field effect where the lens is simulated by a random distribution of N
 samples on a unit disk 
 
-![dof]("1º Project/Previews/dof.png")
+![dof](1º Project/Previews/dof.png)
 
 3. Acceleration structure
     1. Uniform Grid integration
     2. Bounding Volume Hierarchy (BVH)
 
-![dragon]("1º Project/Previews/dragon.png")
+![dragon](1º Project/Previews/dragon.png)
 
 ## GPU PathTracer
 
@@ -43,4 +43,4 @@ transparent materials
 5. Depth-of-Field
 6. Beer’s law for light absorption inside a transparent dieletric 
 
-![pathtracer]("1º Project/Previews/pathtracer.png")
+![pathtracer](1º Project/Previews/pathtracer.png)
