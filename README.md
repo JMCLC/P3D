@@ -44,3 +44,21 @@ transparent materials
 6. Beer’s law for light absorption inside a transparent dieletric 
 
 ![pathtracer](1º%20Project/Previews/pathtracer.png)
+
+# 2º Project
+## Unreal Engine 5
+![demo](2º%20Project/Previews/Demo_Group6.gif)
+
+1) A full 3D scene including different spaces, configuration, textures and lights
+2) Objects that illustrate different types of collisions
+a. Player control: destroy/pick up objects, push objects
+b. Change the environment of the scene based on trigger events. Examples include turn the lights on/off, change textures, and so forth
+c. Have autonomous objects like a ceiling fan
+3) Visual effects
+a. Different types of materials and lights, , textures; and post-processing 
+b. Particle systems to convey smoke, fog, fire, explosion, etc.
+c. Global Illumination effects (eg. Ambient Occlusion, Reflections, Refractions, Shadows - etc).
+
+![Axes](2º%20Project/Previews/Axes.png)
+
+![EasterEgg](2º%20Project/Previews/Easter%20Egg.png)
